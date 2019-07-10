@@ -26,16 +26,10 @@ function filterByLength(people, length) {
  *    // → ['Matt', 'Kanye', 'Hans']
  */
 function everyNPerson(people, n) {
-  if (!n) {
-    return people;
+  if (n === 0) {
+    return [...people];
   }
-  const returnedArray = [];
-  people.forEach(person => {
-    if (people.indexOf(person) % n === 0) {
-      returnedArray.push(person);
-    }
-  });
-  return returnedArray;
+  return people.filter((_, i) => i % n === 0);
 }
 
 /**
@@ -48,15 +42,16 @@ function everyNPerson(people, n) {
  *    // → ['KW', 'BO']
  */
 function initials(people) {
-  const returnedArray = [];
-  let create = '';
-  people.forEach(person => {
-    create += person[0];
-    create += person[person.indexOf(' ') + 1];
-    returnedArray.push(create);
-    create = '';
-  });
-  return returnedArray;
+  return people.map(person => getInitials(person)); // much more declarative
+}
+
+function getInitials(person) {
+  const [firstName, lastName] = person.split(' '); // ['Kanye', 'West']
+  /* old syntax
+  const firstName = nameArr[0];
+  const lastName = nameArr[1]; 
+  */
+  return `${firstName[0]}${lastName[0]}`;
 }
 
 /**
@@ -69,15 +64,10 @@ function initials(people) {
  *    // → ['1. Kanye', '2. Barack']
  */
 function peopleWithPosition(people) {
-  const returnedArray = [];
-  let create = '';
-  people.forEach(person => {
-    create += `${people.indexOf(person)}: `;
-    create += person;
-    returnedArray.push(create);
-    create = '';
-  });
-  return returnedArray;
+  return people.map((person, index) => getNameWithNumber(person, index));
+}
+function getNameWithNumber(name, number) {
+  return `${number}: ${name}`;
 }
 
 /**
@@ -86,7 +76,7 @@ function peopleWithPosition(people) {
  * @returns {string[]} sorted array
  */
 function sortByFirstName(people) {
-  return people.sort();
+  return [...people].sort(); // shallow clone
 }
 
 /**
@@ -95,27 +85,27 @@ function sortByFirstName(people) {
  * @returns {string[]} sorted array
  */
 function sortByLastName(people) {
-  let lastNameFirst = [];
-  const firstNameFirst = [];
-  people.forEach(person => {
-    // split the name
-    const lastNameSplit = person.split(' ');
-    // put last name 1st
-    const holder = `${lastNameSplit[1]} ${lastNameSplit[0]}`;
-    lastNameFirst.push(holder);
-  });
-  // theyre now in reverse. sort normally
-  lastNameFirst = lastNameFirst.sort();
-  // boom sorted
-  // now rearrange again
-  lastNameFirst.forEach(person => {
-    // split
-    const lastNameSplit2 = person.split(' ');
-    // put last name last
-    const holder2 = `${lastNameSplit2[1]} ${lastNameSplit2[0]}`;
-    firstNameFirst.push(holder2);
-  });
-  return firstNameFirst;
+  return [...people].sort((left, right) => compareLastNames(left, right));
+  // const sortedArray = [...people];
+  // return sortedArray.sort((a, b) => {
+  //   const alastName = a.split(' ')[1];
+  //   const blastName = b.split(' ')[1];
+  //   if (alastName > blastName) {
+  //     return 1;
+  //   }
+  //   if (alastName < blastName) {
+  //     return -1;
+  //   }
+  //   return 0; // stable sort
+  // });
+}
+
+function compareLastNames(lName, rName) {
+  return getLastName(lName) > getLastName(rName) ? 1 : -1;
+}
+
+function getLastName(name) {
+  return name.split(' ')[1];
 }
 
 /**
@@ -124,8 +114,7 @@ function sortByLastName(people) {
  * @return Number of characters
  */
 function countTotalCharacters(people) {
-  const reducer = (total, current) => total + current.length;
-  return people.reduce(reducer, 0);
+  return people.reduce((total, current) => total + current.length, 0);
 }
 
 /**
